@@ -1,0 +1,16 @@
+# --- Execução de LLM Local ---
+llama-cpp-python
+huggingface-hub
+
+# --- Orquestração e Busca Local ---
+langchain
+langchain-community
+faiss-cpu
+sentence-transformers
+
+# --- API Local & Utilitários ---
+fastapi
+uvicorn[standard]
+python-dotenv
+python-jose
+requests
