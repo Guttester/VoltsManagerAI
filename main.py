@@ -1,4 +1,4 @@
-from AgenteAI.VoltsManagerAI import VoltsManagerAI
+from ManagerConfig.VoltsManagerAI import VoltsManagerAI
 
 VoltsAgente = VoltsManagerAI()
 obj= VoltsAgente.CarregaAgenteAI()

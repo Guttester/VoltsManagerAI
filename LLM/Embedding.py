@@ -1,8 +1,12 @@
+from sentence_transformers import SentenceTransformer
+
 class Embedding:
+
     def __init__(self):
-        # Carrega o modelo de embeddings (ex: SentenceTransformers / llama-cpp-embeddings)
-        pass
+        self.model = SentenceTransformer(
+            "sentence-transformers/all-MiniLM-L6-v2"
+        )
 
     def GetEmbedding(self, text: str):
-        """Gera os vetores do texto"""
-        pass
+        """Gera o vetor de embedding do texto."""
+        return self.model.encode(text)

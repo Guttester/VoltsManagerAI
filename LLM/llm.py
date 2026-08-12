@@ -2,12 +2,16 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from llama_cpp import Llama
+from .Embedding import Embedding
+from .rag import Rag
 
 BaseDir = Path(__file__).resolve().parent.parent
 load_dotenv(BaseDir / ".env")
 
-class LLM:
+class LLM(Embedding):
     def __init__(self):
+        super().__init__()
+        self.rag = Rag(self)
         self.Model= None
         MODELnome = os.getenv("ModelNome")
         self.__ModelPath = BaseDir / "Model" / MODELnome if MODELnome else None
@@ -35,9 +39,16 @@ class LLM:
 
         MaxTokens = int(os.getenv("ModelMaxToken", 512))
         Temperature = float(os.getenv("ModelTemperature", 0.7))
-
-        PromptInjetor = f"<|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
-
+        Contexto = self.rag.SearchContext(prompt)
+        
+        PromptInjetor = (
+            f"<|start_header_id|>user<|end_header_id|>\n\n"
+            f"Contexto:\n{Contexto}\n\n"
+            f"Pergunta:\n{prompt}"
+            f"<|eot_id|>"
+            f"<|start_header_id|>assistant<|end_header_id|>\n\n"
+        )
+    
         response = self.Model(
             PromptInjetor,
             max_tokens= MaxTokens,
