@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoltsManager AI</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- BOTÃO FLUTUANTE DE ABRIR CHAT -->
+  <button class="chat-launcher" id="chatLauncher" aria-label="Abrir assistente">
+    <span class="launcher-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M20 11.5C20 16.194 16.194 20 11.5 20C9.88 20 8.37 19.55 7.05 18.78L4 20L5.05 16.9C4.38 15.65 4 14.2 4 12.65C4 7.96 7.8 4 12.5 4C17.2 4 20 7.1 20 11.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M8 12H8.01M12 12H12.01M16 12H16.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="notification-dot"></span>
+  </button>
+
+  <!-- JANELA PRINCIPAL DO CHAT -->
+  <section class="chat-window" id="chatWindow">
+
+    <!-- HEADER -->
+    <header class="chat-header">
+      <div class="assistant-identity">
+        <div class="assistant-avatar">
+          <span>V</span>
+          <i></i>
+        </div>
+        <div class="assistant-info">
+          <strong>VoltsManager AI</strong>
+          <span><b></b> Online agora</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- BOTÃO EXPANDIR PARA TELA INTEIRA -->
+        <button class="header-button" id="expandChat" title="Expandir" aria-label="Expandir chat">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M8 4H4V8M16 4H20V8M20 16V20H16M4 16V20H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <!-- BOTÃO RECOLHER/ENCOLHER -->
+        <button class="header-button" id="minimizeChat" title="Recolher" aria-label="Recolher chat">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M6 12H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CORPO DE MENSAGENS E SUGESTÕES -->
+    <div class="chat-body">
+      <div class="welcome">
+        <div class="welcome-avatar">✦</div>
+        <h2>Olá! 👋</h2>
+        <p>Sou o assistente inteligente do <strong>VoltsManager</strong>. Como posso ajudar?</p>
+      </div>
+
+
+      <div class="messages" id="messages">
+        <div class="message assistant-message">
+          Posso ajudar você a encontrar a melhor solução para seu projeto.
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMPO DE ENTRADA DO CHAT -->
+    <footer class="chat-footer">
+      <div class="input-wrapper">
+        <input type="text" id="chatInput" placeholder="Digite sua mensagem..." autocomplete="off">
+        <button class="send-button" id="sendMessage" aria-label="Enviar mensagem">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M21 3L10.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M21 3L14.3 21L10.5 13.5L3 9.7L21 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <small>VoltsManager AI pode cometer erros.</small>
+    </footer>
+
+  </section>
+
+  <script src="/static/script.js" defer></script>
+</body>
+</html>

@@ -1,26 +1,16 @@
-import sys
-from LLM.llm import LLM
+import os
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
-def ChatLoop(bot: LLM):
-    UserInput = input("\nVocê: ").strip()
+app = FastAPI()
 
-    # Condição de saída do loop
-    if UserInput.lower() in ["sair", "exit", "quit"]:
-        print("\nSaindo do chat... Até mais!")
-        sys.exit(0)
+base_dir = os.path.dirname(os.path.abspath(__file__))
+front_dir = os.path.join(base_dir, "Front")
 
-    if UserInput:
-        resposta = bot.GerateChat(UserInput)
-        print(f"\nVoltsAI: {resposta}")
+# Monta a pasta Front para carregar CSS/JS estáticos
+app.mount("/static", StaticFiles(directory=front_dir), name="static")
 
-    # Chamada recursiva para manter o chat ativo
-    ChatLoop(bot)
-
-if __name__ == "__main__":
-    BotAgent = LLM()
-    print(f"Carregando modelo em: \033[31m{BotAgent.GetModelPath()}\033[0m... \n")
-    
-    print("=== VoltsManagerAI Inicializado ===")
-    print("Digite sua mensagem (ou 'sair' para encerrar):\n")
-
-    ChatLoop(BotAgent)
+@app.get("/")
+def read_root():
+    return FileResponse(os.path.join(front_dir, "index.html"))
