@@ -5,7 +5,7 @@ const minimizeChat = document.getElementById('minimizeChat');
 
 /* ============================== GLOBAL ============================== */
 let isFirstInteraction = true; 
-
+const voltsAiChat = document.getElementById('VoltsAiChat');
 const welcomeScreen = document.getElementById('welcomeScreen');
 const chatInput = document.getElementById('chatInput');
 const sendButton = document.getElementById('sendMessage');
