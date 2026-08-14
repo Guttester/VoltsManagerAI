@@ -1,9 +1,9 @@
 import os
 import asyncio
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from owasp import configure_security, security_headers
 from pydantic import BaseModel
 from LLM.llm import LLM
 
@@ -15,21 +15,17 @@ from slowapi.errors import RateLimitExceeded
 # Inicialização da instância da arquitetura do LLM
 llm_agent = LLM()
 llm_semaphore = asyncio.Semaphore(1)
+active_requests = set()
 
 # Configuração do Rate Limiter por IP
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
+
+configure_security(app)
+app.middleware("http")(security_headers)
+
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-# 1. Configuração do CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Substitua pelo domínio em produção
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 class ChatRequest(BaseModel):
     message: str
@@ -43,20 +39,33 @@ def read_root():
     return FileResponse(os.path.join(front_dir, "index.html"))
 
 @app.post("/api/chat")
-@limiter.limit("2/30seconds")
+@limiter.limit("10/minute")
 async def chat_endpoint(request: Request, payload: ChatRequest):
-    user_msg = payload.message
+    user_ip = get_remote_address(request)
     
-    # Controle de concorrência global (Fila):
-    # Garante que apenas 1 requisição processe o LLM por vez, evitando 
-    # o gargalo de CPU/RAM em servidores VPS com poucos vCores.
-    # 
-    # Nota: Se no futuro a infraestrutura contar com um gerenciador de filas externo 
-    # (ex: Redis/Celery/RabbitMQ), remova este 'async with' e chame a task diretamente.
-    async with llm_semaphore:
-        resposta = await asyncio.to_thread(llm_agent.GerateChat, prompt=user_msg)
+    if user_ip in active_requests:
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "Aguarde a resposta da sua requisição anterior."}
+        )
+
+    active_requests.add(user_ip)
+    
+    try:
+        user_msg = payload.message
         
-    return {"reply": resposta}
+        # Controle de concorrência global (Fila):
+        # Garante que apenas 1 requisição processe o LLM por vez, evitando 
+        # o gargalo de CPU/RAM em servidores VPS com poucos vCores.
+        # 
+        # Nota: Se no futuro a infraestrutura contar com um gerenciador de filas externo 
+        # (ex: Redis/Celery/RabbitMQ), remova este 'async with' e chame a task diretamente.
+        async with llm_semaphore:
+            resposta = await asyncio.to_thread(llm_agent.GerateChat, prompt=user_msg)
+            
+        return {"reply": resposta}
+    finally:
+        active_requests.discard(user_ip)
 
 if os.path.exists(front_dir):
     app.mount("/static", StaticFiles(directory=front_dir), name="static")

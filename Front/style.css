@@ -505,3 +505,32 @@ body.dark .volts-bubble,
   min-height: 0; 
   overflow-y: auto;
 }
+
+/* Animação do Loading */
+.volts-loading-bubble {
+  color: #a1a1aa;
+  font-style: italic;
+}
+
+.volts-dots span {
+  animation: voltsBlink 1.4s infinite both;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.volts-dots span:nth-child(1) { animation-delay: 0.0s; }
+.volts-dots span:nth-child(2) { animation-delay: 0.2s; }
+.volts-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes voltsBlink {
+  0%   { opacity: 0.2; transform: translateY(0px); }
+  20%  { opacity: 1;   transform: translateY(-2px); }
+  100% { opacity: 0.2; transform: translateY(0px); }
+}
+
+/* Estado visual do Input e Botão desabilitados durante a requisição */
+#chatInput:disabled,
+#sendMessage:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -35,17 +35,7 @@ function loadVoltsInitialGreeting() {
 }
 
 /* ======================== FUNÇÃO DE CONTROLE ======================== */
-function handleFirstMessage() {
-  if (isFirstInteraction) {
-    isFirstInteraction = false;
-    
-    // Oculta a tela de boas-vindas ao enviar a 1ª mensagem
-    if (welcomeScreen) {
-      welcomeScreen.style.display = 'none';
-      // Ou alternativamente: welcomeScreen.remove();
-    }
-  }
-}
+
 /* ======================== REQUISIÇÃO / ENVIO ======================== */
 function sendMessage() {
   const text = chatInput.value.trim();
@@ -64,7 +54,7 @@ function renderVoltsBubble(senderRole, messageContent) {
 
   const userAvatar = document.createElement('div');
   userAvatar.className = 'volts-avatar';
-  userAvatar.textContent = senderRole === 'user' ? '⚡' : '🤖';
+  userAvatar.textContent = senderRole === 'user' ? '👤' : '⚡';
 
   const timeStamp = document.createElement('div');
   timeStamp.className = 'volts-time';
@@ -118,7 +108,104 @@ function loadVoltsInitialGreeting() {
 /* ====================================================================
    REQUISIÇÃO / ENVIO
    ==================================================================== */
+function showVoltsLoading() {
+  const chatContainer = document.getElementById('VoltsAiChat');
+  if (!chatContainer) return;
+
+  // Cria a estrutura usando a mesma classe que definimos pro seu layout
+  const loadingCard = document.createElement('article');
+  loadingCard.className = 'volts-msg volts-assistant volts-loading-card';
+  loadingCard.id = 'voltsAiLoading';
+
+  loadingCard.innerHTML = `
+    <div class="volts-meta">
+      <div class="volts-avatar">⚡</div>
+    </div>
+    <div class="volts-bubble volts-loading-bubble">
+      <span class="volts-dots">Pensando<span>.</span><span>.</span><span>.</span></span>
+    </div>
+  `;
+
+  chatContainer.appendChild(loadingCard);
+
+  // Auto-scroll para acompanhar o aparecimento do loading
+  const scrollArea = chatContainer.closest('.messages-area') || chatContainer;
+  requestAnimationFrame(() => {
+    scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+  });
+}
+
+// Remove a bolha de loading da tela
+function removeVoltsLoading() {
+  const loadingCard = document.getElementById('voltsAiLoading');
+  if (loadingCard) loadingCard.remove();
+}
+
+// Trava/Destrava o input e o botão de enviar
+function toggleChatControls(disabled) {
+  const chatInput = document.getElementById("chatInput");
+  const sendButton = document.getElementById("sendMessage");
+
+  if (chatInput) chatInput.disabled = disabled;
+  if (sendButton) sendButton.disabled = disabled;
+}
+
+/* ====================================================================
+   FUNÇÕES AUXILIARES DE LOADING E DESABILITAÇÃO
+   ==================================================================== */
+
+// Mostra a bolha de "Pensando..." no chat
+function showVoltsLoading() {
+  const chatContainer = document.getElementById('VoltsAiChat');
+  if (!chatContainer) return;
+
+  // Cria a estrutura usando a mesma classe que definimos pro seu layout
+  const loadingCard = document.createElement('article');
+  loadingCard.className = 'volts-msg volts-assistant volts-loading-card';
+  loadingCard.id = 'voltsAiLoading';
+
+  loadingCard.innerHTML = `
+    <div class="volts-meta">
+      <div class="volts-avatar">⚡</div>
+    </div>
+    <div class="volts-bubble volts-loading-bubble">
+      <span class="volts-dots">Pensando<span>.</span><span>.</span><span>.</span></span>
+    </div>
+  `;
+
+  chatContainer.appendChild(loadingCard);
+
+  // Auto-scroll para acompanhar o aparecimento do loading
+  const scrollArea = chatContainer.closest('.messages-area') || chatContainer;
+  requestAnimationFrame(() => {
+    scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+  });
+}
+
+// Remove a bolha de loading da tela
+function removeVoltsLoading() {
+  const loadingCard = document.getElementById('voltsAiLoading');
+  if (loadingCard) loadingCard.remove();
+}
+
+// Trava/Destrava o input e o botão de enviar
+function toggleChatControls(disabled) {
+  const chatInput = document.getElementById("chatInput");
+  const sendButton = document.getElementById("sendMessage");
+
+  if (chatInput) chatInput.disabled = disabled;
+  if (sendButton) sendButton.disabled = disabled;
+}
+
+/* ====================================================================
+   REQUISIÇÃO COM LOADING INTEGRADO
+   ==================================================================== */
+
 async function sendVoltsRequest(userPrompt) {
+  // 1. Inicia o estado de carregamento e trava a interface
+  toggleChatControls(true);
+  showVoltsLoading();
+
   try {
     const response = await fetch(API_ENDPOINT, {
       method: "POST",
@@ -131,10 +218,13 @@ async function sendVoltsRequest(userPrompt) {
 
     console.log("STATUS:", response.status);
 
+    // 2. Remove o loading antes de exibir a resposta/erro na tela
+    removeVoltsLoading();
+
     if (response.status === 429) {
       appendVoltsMessage(
         "assistant",
-        "Limite de requisições atingido (1/30s) para proteger a VPS. Aguarde alguns segundos."
+        "Já estou processando sua mensagem anterior! Por favor, aguarde a resposta antes de enviar outra."
       );
       return;
     }
@@ -168,11 +258,16 @@ async function sendVoltsRequest(userPrompt) {
 
   } catch (error) {
     console.error("ERRO:", error);
-
+    removeVoltsLoading();
     appendVoltsMessage(
       "assistant",
       `${error.name}: ${error.message}`
     );
+  } finally {
+    toggleChatControls(false);
+    
+    const chatInput = document.getElementById("chatInput");
+    if (chatInput) chatInput.focus();
   }
 }
 
