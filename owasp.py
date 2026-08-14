@@ -1,31 +1,18 @@
-import os
-
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 
-ALLOWED_ORIGINS = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:8000"
-).split(",")
-
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1"
-).split(",")
-
-
 def configure_security(app):
     app.add_middleware(
         TrustedHostMiddleware,
-        allowed_hosts=[host.strip() for host in ALLOWED_HOSTS]
+        allowed_hosts=[...]
     )
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[origin.strip() for origin in ALLOWED_ORIGINS],
+        allow_origins=[...],
         allow_credentials=True,
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],
