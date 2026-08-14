@@ -129,15 +129,50 @@ async function sendVoltsRequest(userPrompt) {
       })
     });
 
+    console.log("STATUS:", response.status);
+
+    if (response.status === 429) {
+      appendVoltsMessage(
+        "assistant",
+        "Limite de requisições atingido (1/30s) para proteger a VPS. Aguarde alguns segundos."
+      );
+      return;
+    }
+
+    if (response.status === 504 || response.status === 503) {
+      appendVoltsMessage(
+        "assistant",
+        "O servidor está muito ocupado no momento. Tente novamente em instantes."
+      );
+      return;
+    }
+
     if (!response.ok) {
-      throw new Error(`Erro no servidor (${response.status})`);
+      appendVoltsMessage(
+        "assistant",
+        `Erro no servidor (${response.status})`
+      );
+      return;
     }
 
     const data = await response.json();
-    appendVoltsMessage("assistant", data.reply || data.message);
+
+    console.log("RESPOSTA COMPLETA:", data);
+    console.log("REPLY:", data.reply);
+    console.log("MESSAGE:", data.message);
+
+    appendVoltsMessage(
+      "assistant",
+      data.reply || data.message || "O modelo não retornou nenhuma mensagem."
+    );
 
   } catch (error) {
-    appendVoltsMessage("assistant", `⚠️ Erro: ${error.message}`);
+    console.error("ERRO:", error);
+
+    appendVoltsMessage(
+      "assistant",
+      `${error.name}: ${error.message}`
+    );
   }
 }
 

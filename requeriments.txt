@@ -14,3 +14,4 @@ uvicorn[standard]
 python-dotenv
 python-jose
 requests
+slowapi

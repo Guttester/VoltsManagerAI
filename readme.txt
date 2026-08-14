@@ -11,8 +11,13 @@
 -- #3 - Instalar depedências dentro do arquivo requeriments.
 --   + pip install -r requirements.txt
 -- 
-
-
+-- #4 - Executar serviço.
+--   + uvicorn fastApi:app --reload
+-- 
+-- 
+-- 
+-- 
+-- 
 
 [fastApi.py (OWASP / Endpoints)] 
        │
