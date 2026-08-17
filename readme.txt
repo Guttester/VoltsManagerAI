@@ -27,8 +27,8 @@
 -- #2 - Ativar ambiente virtual.
 --   + source .venv/bin/activate ( or ) .\.venv\Scripts\activate
 -- 
--- #3 - Instalar dependências dentro do arquivo requirements.
---   + pip install -r requirements.txt
+-- #3 - Instalar dependências dentro do arquivo requeriments.
+--   + pip install -r requeriments.txt
 -- 
 -- #4 - Executar serviço.
 --   + uvicorn fastApi:app --reload
